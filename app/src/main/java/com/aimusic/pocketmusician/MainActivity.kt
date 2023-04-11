@@ -19,60 +19,6 @@ import com.aimusic.pocketmusician.ui.theme.*
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.SizeMode
 
-//class MainActivity : ComponentActivity() {
-//    @OptIn(ExperimentalMaterial3Api::class)
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContent {
-//            PocketMusicianTheme {
-//                // A surface container using the 'background' color from the theme
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(),
-//                    color = MaterialTheme.colorScheme.background
-//                ) {
-//                    Scaffold(
-//                        floatingActionButton = {
-//                            ExtendedFloatingActionButton(
-//                                onClick = {},
-//                                text = {Text(text = "Add songs")},
-//                                icon = {Icon(Icons.Filled.Add, null)},
-//                                containerColor = MaterialTheme.colorScheme.primary,
-//                                contentColor = MaterialTheme.colorScheme.onPrimary
-//                            )
-//                        },
-//                        topBar = {
-//                            TopAppBar(
-//                                title = {
-//                                    Text(text = "Queue")
-//                                },
-//                                colors = TopAppBarDefaults.smallTopAppBarColors(
-//                                    containerColor = MaterialTheme.colorScheme.inverseSurface,
-//                                    titleContentColor = MaterialTheme.colorScheme.inverseOnSurface
-//                                )
-//                            )
-//                        }
-//                    ){values ->
-//                        LazyColumn(contentPadding = values){
-//                            items(50) {
-//                                ListItem(
-//                                    headlineText = { Text("Song $it") },
-//                                    colors = ListItemDefaults.colors(
-//                                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-//                                        headlineColor = MaterialTheme.colorScheme.onSurfaceVariant
-//                                    ),
-//                                    //modifier = Modifier.padding(1.dp),
-//                                    trailingContent = { Icon(Icons.Filled.Favorite, contentDescription = null) }
-//                                )
-//                                Divider(color = MaterialTheme.colorScheme.inverseSurface)
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//}
-
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,120 +30,174 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(20.dp)
-                    ){
-                        Text(
-                            text = "Music Type",
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        FlowRow(
-                            modifier = Modifier.fillMaxWidth(),
-                            mainAxisSpacing = 8.dp,
-                            mainAxisSize = SizeMode.Wrap
-                        ) {
-                            AssistChip(
-                                onClick = { },
-                                colors = AssistChipDefaults.assistChipColors(
-                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                ),
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Outlined.FavoriteBorder,
-                                        contentDescription = null
-                                    )
-                                },
-                                label = {
-                                    Text(text = "Rock")
-                                }
+                    Scaffold(
+                        floatingActionButton = {
+                            ExtendedFloatingActionButton(
+                                onClick = {},
+                                text = {Text(text = "Add songs")},
+                                icon = {Icon(Icons.Filled.Add, null)},
+                                containerColor = MaterialTheme.colorScheme.primary,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
                             )
-                            AssistChip(
-                                onClick = { },
-                                colors = AssistChipDefaults.assistChipColors(
-                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                ),
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Outlined.FavoriteBorder,
-                                        contentDescription = null
-                                    )
+                        },
+                        topBar = {
+                            TopAppBar(
+                                title = {
+                                    Text(text = "Queue")
                                 },
-                                label = {
-                                    Text(text = "Dance")
-                                }
-                            )
-                            AssistChip(
-                                onClick = { },
-                                colors = AssistChipDefaults.assistChipColors(
-                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                ),
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Outlined.FavoriteBorder,
-                                        contentDescription = null
-                                    )
-                                },
-                                label = {
-                                    Text(text = "Relaxing")
-                                }
-                            )
-                            AssistChip(
-                                onClick = { },
-                                colors = AssistChipDefaults.assistChipColors(
-                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                ),
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Outlined.FavoriteBorder,
-                                        contentDescription = null
-                                    )
-                                },
-                                label = {
-                                    Text(text = "Study")
-                                }
-                            )
-                            AssistChip(
-                                onClick = { },
-                                colors = AssistChipDefaults.assistChipColors(
-                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                ),
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Outlined.FavoriteBorder,
-                                        contentDescription = null
-                                    )
-                                },
-                                label = {
-                                    Text(text = "Electronic")
-                                }
-                            )
-                            AssistChip(
-                                onClick = { },
-                                colors = AssistChipDefaults.assistChipColors(
-                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                                ),
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Outlined.FavoriteBorder,
-                                        contentDescription = null
-                                    )
-                                },
-                                label = {
-                                    Text(text = "Suspenseful")
-                                }
+                                colors = TopAppBarDefaults.smallTopAppBarColors(
+                                    containerColor = MaterialTheme.colorScheme.inverseSurface,
+                                    titleContentColor = MaterialTheme.colorScheme.inverseOnSurface
+                                )
                             )
                         }
-                        Divider(color = MaterialTheme.colorScheme.inverseSurface)
-
+                    ){values ->
+                        LazyColumn(contentPadding = values){
+                            items(50) {
+                                ListItem(
+                                    headlineText = { Text("Song $it") },
+                                    colors = ListItemDefaults.colors(
+                                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                                        headlineColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                    ),
+                                    //modifier = Modifier.padding(1.dp),
+                                    trailingContent = { Icon(Icons.Filled.Favorite, contentDescription = null) }
+                                )
+                                Divider(color = MaterialTheme.colorScheme.inverseSurface)
+                            }
+                        }
                     }
                 }
             }
         }
     }
 }
+
+//class MainActivity : ComponentActivity() {
+//    @OptIn(ExperimentalMaterial3Api::class)
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        setContent {
+//            PocketMusicianTheme {
+//                // A surface container using the 'background' color from the theme
+//                Surface(
+//                    modifier = Modifier.fillMaxSize(),
+//                    color = MaterialTheme.colorScheme.background
+//                ) {
+//                    Column(
+//                        modifier = Modifier
+//                            .fillMaxHeight()
+//                            .padding(20.dp)
+//                    ){
+//                        Text(
+//                            text = "Music Type",
+//                            style = MaterialTheme.typography.titleLarge
+//                        )
+//                        Spacer(modifier = Modifier.height(8.dp))
+//                        FlowRow(
+//                            modifier = Modifier.fillMaxWidth(),
+//                            mainAxisSpacing = 8.dp,
+//                            mainAxisSize = SizeMode.Wrap
+//                        ) {
+//                            AssistChip(
+//                                onClick = { },
+//                                colors = AssistChipDefaults.assistChipColors(
+//                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+//                                ),
+//                                leadingIcon = {
+//                                    Icon(
+//                                        imageVector = Icons.Outlined.FavoriteBorder,
+//                                        contentDescription = null
+//                                    )
+//                                },
+//                                label = {
+//                                    Text(text = "Rock")
+//                                }
+//                            )
+//                            AssistChip(
+//                                onClick = { },
+//                                colors = AssistChipDefaults.assistChipColors(
+//                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+//                                ),
+//                                leadingIcon = {
+//                                    Icon(
+//                                        imageVector = Icons.Outlined.FavoriteBorder,
+//                                        contentDescription = null
+//                                    )
+//                                },
+//                                label = {
+//                                    Text(text = "Dance")
+//                                }
+//                            )
+//                            AssistChip(
+//                                onClick = { },
+//                                colors = AssistChipDefaults.assistChipColors(
+//                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+//                                ),
+//                                leadingIcon = {
+//                                    Icon(
+//                                        imageVector = Icons.Outlined.FavoriteBorder,
+//                                        contentDescription = null
+//                                    )
+//                                },
+//                                label = {
+//                                    Text(text = "Relaxing")
+//                                }
+//                            )
+//                            AssistChip(
+//                                onClick = { },
+//                                colors = AssistChipDefaults.assistChipColors(
+//                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+//                                ),
+//                                leadingIcon = {
+//                                    Icon(
+//                                        imageVector = Icons.Outlined.FavoriteBorder,
+//                                        contentDescription = null
+//                                    )
+//                                },
+//                                label = {
+//                                    Text(text = "Study")
+//                                }
+//                            )
+//                            AssistChip(
+//                                onClick = { },
+//                                colors = AssistChipDefaults.assistChipColors(
+//                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+//                                ),
+//                                leadingIcon = {
+//                                    Icon(
+//                                        imageVector = Icons.Outlined.FavoriteBorder,
+//                                        contentDescription = null
+//                                    )
+//                                },
+//                                label = {
+//                                    Text(text = "Electronic")
+//                                }
+//                            )
+//                            AssistChip(
+//                                onClick = { },
+//                                colors = AssistChipDefaults.assistChipColors(
+//                                    leadingIconContentColor = MaterialTheme.colorScheme.onSurfaceVariant
+//                                ),
+//                                leadingIcon = {
+//                                    Icon(
+//                                        imageVector = Icons.Outlined.FavoriteBorder,
+//                                        contentDescription = null
+//                                    )
+//                                },
+//                                label = {
+//                                    Text(text = "Suspenseful")
+//                                }
+//                            )
+//                        }
+//                        Divider(color = MaterialTheme.colorScheme.inverseSurface)
+//
+//                    }
+//                }
+//            }
+//        }
+//    }
+//}
 
 
 

@@ -1,5 +1,7 @@
 package com.aimusic.pocketmusician
 
+import android.content.Context
+import android.media.MediaPlayer
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import android.os.Bundle
@@ -25,6 +27,13 @@ import androidx.compose.ui.unit.dp
 import com.aimusic.pocketmusician.ui.theme.*
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.SizeMode
+import kotlinx.coroutines.GlobalScope.coroutineContext
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -45,7 +54,7 @@ class MainActivity : ComponentActivity() {
                             ExtendedFloatingActionButton(
                                 onClick = {
                                     if(genreId != 0){
-                                        setContent{SongQueue(genreList[genreId], numOfSongs.toInt())}
+                                        setContent{SongQueue(genreId, genreList[genreId], numOfSongs.toInt())}
                                     }
                                 },
                                 text = {Text(text = "Add Songs")},
@@ -251,22 +260,36 @@ class MainActivity : ComponentActivity() {
 
 @ExperimentalMaterial3Api
 @Composable
-fun SongQueue(genreType: String, numOfSongs: Int){
+fun SongQueue(genreId: Int, genreType: String, numOfSongs: Int){
     PocketMusicianTheme {
         // A surface container using the 'background' color from the theme
         Surface(
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
         ) {
-//            var songList = arrayOf("Naatu Naatu", "Despacito", "Real Slim Shady", "Gangta's Paradise", "Players", "Old Town Road","Naatu Naatu", "Despacito", "Real Slim Shady", "Gangta's Paradise", "Players", "Old Town Road","Naatu Naatu", "Despacito", "Real Slim Shady", "Gangta's Paradise", "Players", "Old Town Road","Naatu Naatu", "Despacito", "Real Slim Shady", "Gangta's Paradise", "Players", "Old Town Road","Naatu Naatu", "Despacito", "Real Slim Shady", "Gangta's Paradise", "Players", "Old Town Road")
             var songList = Array(numOfSongs) { i -> "$genreType song $i" }
-            var selectedSongId by remember{ mutableStateOf(-1) }
+            var rawSongList = RawSongList()
+            rawSongList.initiateSongList()
+            var genreToRawSongList = rawSongList.genreToSongList
+            var selectedSongId by remember{ mutableStateOf(-10) }
             var someSongSelected by remember{ mutableStateOf(false) }
             var isPlaying by remember{ mutableStateOf(false) }
+            var mediaPlayer = MediaPlayer()
+            var mediaPlayerInitialized = false
+            var context = LocalContext.current
+            var positionInSong by remember{ mutableStateOf(0) }
+            var durationOfSong by remember{ mutableStateOf(100) }
+            lateinit var coroutineJob: Job
+            val composableScope = rememberCoroutineScope()
             Scaffold(
                 floatingActionButton = {
                     ExtendedFloatingActionButton(
-                        onClick = {},
+                        onClick = {
+                            if(mediaPlayerInitialized) {
+                                mediaPlayer.stop()
+                                mediaPlayer.release()
+                            }
+                        },
                         text = {Text(text = "Add songs")},
                         icon = {Icon(Icons.Filled.Add, null)},
                         containerColor = MaterialTheme.colorScheme.primary,
@@ -295,12 +318,29 @@ fun SongQueue(genreType: String, numOfSongs: Int){
                                 .fillMaxSize()
                                 .padding(0.dp)
                         ){
-                            var positionInSong by remember{ mutableStateOf(0f) }
                             Slider(
-                                value = positionInSong,
-                                onValueChange = {newPos -> positionInSong = newPos},
-                                valueRange = 0f..100f,
-                                modifier = Modifier.padding(0.dp).fillMaxWidth()
+                                value = positionInSong.toFloat(),
+                                onValueChange = {
+                                    coroutineJob.cancel()
+                                    positionInSong = it.roundToInt()
+                                },
+                                valueRange = 0f..durationOfSong.toFloat(),
+                                modifier = Modifier.padding(0.dp).fillMaxWidth(),
+                                onValueChangeFinished = {
+                                    if(mediaPlayerInitialized){
+                                        mediaPlayer.seekTo(positionInSong)
+                                        coroutineJob = composableScope.launch {
+                                            try{
+                                                while(isPlaying){
+                                                    positionInSong = mediaPlayer.currentPosition
+                                                    delay(100)
+                                                }
+                                            } finally {
+                                                coroutineContext.cancel()
+                                            }
+                                        }
+                                    }
+                                }
                             )
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
@@ -314,6 +354,12 @@ fun SongQueue(genreType: String, numOfSongs: Int){
                                         if (someSongSelected){
                                             selectedSongId -= 1
                                             if (selectedSongId == -1) selectedSongId = songList.size-1
+                                            mediaPlayer.stop()
+                                            mediaPlayer.release()
+                                            mediaPlayer = MediaPlayer.create(context, genreToRawSongList[genreId]!![selectedSongId%12])
+                                            positionInSong = 0
+                                            durationOfSong = mediaPlayer.duration
+                                            if(isPlaying) mediaPlayer.start()
                                         }
                                     }
                                 ) {
@@ -326,9 +372,45 @@ fun SongQueue(genreType: String, numOfSongs: Int){
                                 IconButton(
                                     onClick = {
                                         isPlaying = !isPlaying
+                                        if (!isPlaying){
+                                            mediaPlayer.pause()
+                                        }
+                                        else{
+                                            mediaPlayer.start()
+                                            coroutineJob = composableScope.launch {
+                                                try{
+                                                    while(isPlaying){
+                                                        positionInSong = mediaPlayer.currentPosition
+                                                        delay(100)
+                                                    }
+                                                } finally {
+                                                    coroutineContext.cancel()
+                                                }
+                                            }
+                                        }
                                         if(!someSongSelected){
                                             selectedSongId = 0
                                             someSongSelected = true
+                                            isPlaying = true
+                                            if (mediaPlayerInitialized) {
+                                                mediaPlayer.stop()
+                                                mediaPlayer.release()
+                                            }
+                                            mediaPlayer = MediaPlayer.create(context, genreToRawSongList[genreId]!![selectedSongId%12])
+                                            positionInSong = 0
+                                            durationOfSong = mediaPlayer.duration
+                                            mediaPlayer.start()
+                                            mediaPlayerInitialized = true
+                                            coroutineJob = composableScope.launch {
+                                                try{
+                                                    while(isPlaying){
+                                                        positionInSong = mediaPlayer.currentPosition
+                                                        delay(100)
+                                                    }
+                                                } finally {
+                                                    coroutineContext.cancel()
+                                                }
+                                            }
                                         }
                                     }
                                 ) {
@@ -343,6 +425,12 @@ fun SongQueue(genreType: String, numOfSongs: Int){
                                         if (someSongSelected){
                                             selectedSongId += 1
                                             if (selectedSongId == songList.size) selectedSongId = 0
+                                            mediaPlayer.stop()
+                                            mediaPlayer.release()
+                                            mediaPlayer = MediaPlayer.create(context, genreToRawSongList[genreId]!![selectedSongId%12])
+                                            positionInSong = 0
+                                            durationOfSong = mediaPlayer.duration
+                                            if(isPlaying) mediaPlayer.start()
                                         }
                                     }
                                 ) {
@@ -372,8 +460,31 @@ fun SongQueue(genreType: String, numOfSongs: Int){
                             ),
                             modifier = Modifier.clickable {
                                 isPlaying = true
+                                var justStarted = false
+                                if (selectedSongId == -10) justStarted = true
                                 selectedSongId = it
                                 someSongSelected = true
+                                if (mediaPlayerInitialized) {
+                                    mediaPlayer.stop()
+                                    mediaPlayer.release()
+                                }
+                                mediaPlayer = MediaPlayer.create(context, genreToRawSongList[genreId]!![selectedSongId%12])
+                                positionInSong = 0
+                                durationOfSong = mediaPlayer.duration
+                                mediaPlayer.start()
+                                mediaPlayerInitialized = true
+                                if(justStarted){
+                                    coroutineJob = composableScope.launch {
+                                        try{
+                                            while(isPlaying){
+                                                positionInSong = mediaPlayer.currentPosition
+                                                delay(100)
+                                            }
+                                        } finally {
+                                            coroutineContext.cancel()
+                                        }
+                                    }
+                                }
                             },
                             trailingContent = {
                                 var isFavorite by remember{ mutableStateOf(false) }

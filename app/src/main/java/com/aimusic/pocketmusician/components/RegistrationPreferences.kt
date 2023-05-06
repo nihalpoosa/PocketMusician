@@ -1,6 +1,6 @@
-package com.aimusic.pocketmusician
+package com.aimusic.pocketmusician.components
 
-import android.os.Bundle
+import com.aimusic.pocketmusician.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -11,36 +11,40 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.Navigator
+import com.aimusic.pocketmusician.Screen
 import com.aimusic.pocketmusician.ui.theme.PocketMusicianTheme
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.SizeMode
 
+
 @ExperimentalMaterial3Api
 @Composable
-fun SongSelection(navController: NavController){
+fun RegistrationPreferences(navController: NavController){
     // A surface container using the 'background' color from the theme
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        var genreList = arrayOf("No selection", "Rock", "Dance", "Relaxing", "Study", "Electronic", "Suspenseful", "Workout", "Dubstep")
-        var genreId by remember{ mutableStateOf(0) }
+        var genrePreferences:List<Int> by remember{ mutableStateOf(listOf()) }
         var numOfSongs by remember{ mutableStateOf(40f) }
         Scaffold(
             floatingActionButton = {
                 ExtendedFloatingActionButton(
                     onClick = {
-                        if(genreId != 0){
-                            navController.navigate(Screen.SongQueueWithoutArgs.route+"/${genreId}/${genreList[genreId]}/${numOfSongs.toInt()}")
+                        if(genrePreferences.isNotEmpty()){
+                            // onSavePreferences() from +"/${genreId}/${genreList[genreId]}/${numOfSongs.toInt()}"
+                            navController.navigate(Screen.LoginPage.route){
+                                popUpTo(Screen.LoginPage.route){inclusive = true}
+                            }
                         }
                     },
-                    text = { Text(text = "Add Songs") },
-                    icon = { Icon(Icons.Filled.Add, null) },
+                    text = { Text(text = "Save Preferences") },
+                    icon = { Icon(painter = painterResource(id = R.drawable.ic_save_preferences), null) },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary
                 )
             }
-        ) {it->
+        ) {
             Column(
                 modifier = Modifier
                     .fillMaxHeight()
@@ -58,10 +62,13 @@ fun SongSelection(navController: NavController){
                     mainAxisSize = SizeMode.Wrap
                 ) {
                     FilterChip(
-                        selected = genreList[genreId] == genreList[1],
+                        selected = genrePreferences.contains(1),
                         onClick = {
-                            if(genreList[genreId] == genreList[1]) genreId = 0
-                            else genreId = 1
+                            genrePreferences =
+                                if(genrePreferences.contains(1))
+                                    genrePreferences.minus(1)
+                                else
+                                    genrePreferences.plus(1)
                         },
                         leadingIcon = {
                             Icon(
@@ -75,10 +82,13 @@ fun SongSelection(navController: NavController){
                         }
                     )
                     FilterChip(
-                        selected = genreList[genreId] == genreList[2],
+                        selected = genrePreferences.contains(2),
                         onClick = {
-                            if(genreList[genreId] == genreList[2]) genreId = 0
-                            else genreId = 2
+                            genrePreferences =
+                                if(genrePreferences.contains(2))
+                                    genrePreferences.minus(2)
+                                else
+                                    genrePreferences.plus(2)
                         },
                         leadingIcon = {
                             Icon(
@@ -92,10 +102,13 @@ fun SongSelection(navController: NavController){
                         }
                     )
                     FilterChip(
-                        selected = genreList[genreId] == genreList[3],
+                        selected = genrePreferences.contains(3),
                         onClick = {
-                            if(genreList[genreId] == genreList[3]) genreId = 0
-                            else genreId = 3
+                            genrePreferences =
+                                if(genrePreferences.contains(3))
+                                    genrePreferences.minus(3)
+                                else
+                                    genrePreferences.plus(3)
                         },
                         leadingIcon = {
                             Icon(
@@ -109,10 +122,13 @@ fun SongSelection(navController: NavController){
                         }
                     )
                     FilterChip(
-                        selected = genreList[genreId] == genreList[4],
+                        selected = genrePreferences.contains(4),
                         onClick = {
-                            if(genreList[genreId] == genreList[4]) genreId = 0
-                            else genreId = 4
+                            genrePreferences =
+                                if(genrePreferences.contains(4))
+                                    genrePreferences.minus(4)
+                                else
+                                    genrePreferences.plus(4)
                         },
                         leadingIcon = {
                             Icon(
@@ -126,10 +142,13 @@ fun SongSelection(navController: NavController){
                         }
                     )
                     FilterChip(
-                        selected = genreList[genreId] == genreList[5],
+                        selected = genrePreferences.contains(5),
                         onClick = {
-                            if(genreList[genreId] == genreList[5]) genreId = 0
-                            else genreId = 5
+                            genrePreferences =
+                                if(genrePreferences.contains(5))
+                                    genrePreferences.minus(5)
+                                else
+                                    genrePreferences.plus(5)
                         },
                         leadingIcon = {
                             Icon(
@@ -143,10 +162,13 @@ fun SongSelection(navController: NavController){
                         }
                     )
                     FilterChip(
-                        selected = genreList[genreId] == genreList[6],
+                        selected = genrePreferences.contains(6),
                         onClick = {
-                            if(genreList[genreId] == genreList[6]) genreId = 0
-                            else genreId = 6
+                            genrePreferences =
+                                if(genrePreferences.contains(6))
+                                    genrePreferences.minus(6)
+                                else
+                                    genrePreferences.plus(6)
                         },
                         leadingIcon = {
                             Icon(
@@ -160,10 +182,13 @@ fun SongSelection(navController: NavController){
                         }
                     )
                     FilterChip(
-                        selected = genreList[genreId] == genreList[7],
+                        selected = genrePreferences.contains(7),
                         onClick = {
-                            if(genreList[genreId] == genreList[7]) genreId = 0
-                            else genreId = 7
+                            genrePreferences =
+                                if(genrePreferences.contains(7))
+                                    genrePreferences.minus(7)
+                                else
+                                    genrePreferences.plus(7)
                         },
                         leadingIcon = {
                             Icon(
@@ -177,10 +202,13 @@ fun SongSelection(navController: NavController){
                         }
                     )
                     FilterChip(
-                        selected = genreList[genreId] == genreList[8],
+                        selected = genrePreferences.contains(8),
                         onClick = {
-                            if(genreList[genreId] == genreList[8]) genreId = 0
-                            else genreId = 8
+                            genrePreferences =
+                                if(genrePreferences.contains(8))
+                                    genrePreferences.minus(8)
+                                else
+                                    genrePreferences.plus(8)
                         },
                         leadingIcon = {
                             Icon(

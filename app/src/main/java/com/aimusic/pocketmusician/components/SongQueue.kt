@@ -1,13 +1,12 @@
-package com.aimusic.pocketmusician
+package com.aimusic.pocketmusician.components
 
+import com.aimusic.pocketmusician.R
 import android.media.MediaPlayer
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -17,6 +16,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.aimusic.pocketmusician.RawSongList
+import com.aimusic.pocketmusician.Screen
 import com.aimusic.pocketmusician.ui.theme.PocketMusicianTheme
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -47,24 +48,6 @@ fun SongQueue(genreId: Int, genreType: String, numOfSongs: Int, navController: N
         lateinit var coroutineJob: Job
         val composableScope = rememberCoroutineScope()
         Scaffold(
-            floatingActionButton = {
-                ExtendedFloatingActionButton(
-                    onClick = {
-                        if(mediaPlayerInitialized) {
-                            coroutineJob.cancel()
-                            mediaPlayer.stop()
-                            mediaPlayer.release()
-                        }
-                        navController.navigate(Screen.SongSelection.route){
-                            popUpTo(Screen.SongSelection.route){inclusive = true}
-                        }
-                    },
-                    text = { Text(text = "Back to selection") },
-                    icon = { Icon(Icons.Filled.ArrowBack, null) },
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            },
             topBar = {
                 TopAppBar(
                     title = {
@@ -73,7 +56,29 @@ fun SongQueue(genreId: Int, genreType: String, numOfSongs: Int, navController: N
                     colors = TopAppBarDefaults.smallTopAppBarColors(
                         containerColor = MaterialTheme.colorScheme.inverseSurface,
                         titleContentColor = MaterialTheme.colorScheme.inverseOnSurface
-                    )
+                    ),
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            if(mediaPlayerInitialized) {
+                                coroutineJob.cancel()
+                                mediaPlayer.stop()
+                                mediaPlayer.release()
+                            }
+                            navController.navigate(Screen.SongSelection.route){
+                                popUpTo(Screen.SongSelection.route){inclusive = true}
+                            }
+                        }) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back to selection", tint = MaterialTheme.colorScheme.inverseOnSurface)
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { /* Handle action icon click */ }) {
+                            Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = MaterialTheme.colorScheme.inverseOnSurface)
+                        }
+                        IconButton(onClick = { /* Handle action icon click */ }) {
+                            Icon(painter = painterResource(id = R.drawable.ic_logout), contentDescription = "Logout", tint = MaterialTheme.colorScheme.inverseOnSurface)
+                        }
+                    }
                 )
             },
             bottomBar = {

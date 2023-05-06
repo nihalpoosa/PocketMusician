@@ -1,16 +1,23 @@
 package com.aimusic.pocketmusician.components
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import com.aimusic.pocketmusician.R
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.Navigator
 import com.aimusic.pocketmusician.Screen
 import com.aimusic.pocketmusician.ui.theme.PocketMusicianTheme
 import com.google.accompanist.flowlayout.FlowRow
@@ -27,6 +34,51 @@ fun SongSelection(navController: NavController){
         var genreList = arrayOf("No selection", "Rock", "Dance", "Relaxing", "Study", "Electronic", "Suspenseful", "Workout", "Dubstep")
         var genreId by remember{ mutableStateOf(0) }
         var numOfSongs by remember{ mutableStateOf(40f) }
+        val options = listOf("Option 1", "Option 2", "Option 3", "Option 4")
+        var selectedOptionIndex by remember { mutableStateOf(0) }
+        var dialogOpen by remember { mutableStateOf(false) }
+        var changeGenreText by remember{ mutableStateOf(false) }
+
+        if (dialogOpen){
+            AlertDialog(
+                onDismissRequest = { dialogOpen = false },
+                modifier = Modifier.background(color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(10.dp)),
+                content = {
+                    Column {
+                        Text(
+                            text = "Select subgenre",
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        options.forEachIndexed { index, item ->
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { selectedOptionIndex = index },
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                RadioButton(
+                                    selected = index == selectedOptionIndex,
+                                    onClick = {selectedOptionIndex = index}
+                                )
+                                Spacer(modifier = Modifier.width(16.dp))
+                                Text(text = item)
+                            }
+                            Divider()
+                        }
+                        Button(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            onClick = {
+                                changeGenreText = true
+                                dialogOpen = false
+                            }) {
+                            Text(text = "Confirm")
+                        }
+                    }
+                }
+            )
+        }
+
         Scaffold(
             floatingActionButton = {
                 ExtendedFloatingActionButton(
@@ -59,8 +111,9 @@ fun SongSelection(navController: NavController){
                     mainAxisSize = SizeMode.Wrap
                 ) {
                     FilterChip(
-                        selected = genreList[genreId] == genreList[1],
+                        selected = genreList[genreId] == genreList[1] && changeGenreText,
                         onClick = {
+                            dialogOpen = true
                             if(genreList[genreId] == genreList[1]) genreId = 0
                             else genreId = 1
                         },
@@ -72,7 +125,7 @@ fun SongSelection(navController: NavController){
                             )
                         },
                         label = {
-                            Text(text = "Rock")
+                            Text(text = if(changeGenreText) options[selectedOptionIndex] else "Rock")
                         }
                     )
                     FilterChip(

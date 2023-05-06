@@ -1,10 +1,7 @@
 package com.aimusic.pocketmusician.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import com.aimusic.pocketmusician.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -13,13 +10,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.aimusic.pocketmusician.GenreFactory
+import com.aimusic.pocketmusician.R
 import com.aimusic.pocketmusician.Screen
-import com.aimusic.pocketmusician.ui.theme.PocketMusicianTheme
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.SizeMode
 
@@ -31,17 +27,22 @@ fun SongSelection(navController: NavController){
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        var genreList = arrayOf("No selection", "Rock", "Dance", "Relaxing", "Study", "Electronic", "Suspenseful", "Workout", "Dubstep")
-        var genreId by remember{ mutableStateOf(0) }
+        var userPreferredGenreIds = listOf(3, 2, 1, 5, 6, 7)
+        var genreIdList by remember { mutableStateOf(userPreferredGenreIds) }
+        var genreId by remember{ mutableStateOf(-1) }
+        var genreIdFromDialog by remember{ mutableStateOf(-1) }
         var numOfSongs by remember{ mutableStateOf(40f) }
-        val options = listOf("Option 1", "Option 2", "Option 3", "Option 4")
-        var selectedOptionIndex by remember { mutableStateOf(0) }
+        var dialogOptions by remember {mutableStateOf(listOf("Option 1", "Option 2", "Option 3", "Option 4"))}
+        var dialogOptionIndex by remember { mutableStateOf(0) }
         var dialogOpen by remember { mutableStateOf(false) }
-        var changeGenreText by remember{ mutableStateOf(false) }
+        var showAllGenres by remember{ mutableStateOf(false) }
 
         if (dialogOpen){
             AlertDialog(
-                onDismissRequest = { dialogOpen = false },
+                onDismissRequest = {
+                    genreIdFromDialog = -1
+                    dialogOpen = false
+                },
                 modifier = Modifier.background(color = MaterialTheme.colorScheme.background, shape = RoundedCornerShape(10.dp)),
                 content = {
                     Column {
@@ -50,29 +51,42 @@ fun SongSelection(navController: NavController){
                             modifier = Modifier.align(Alignment.CenterHorizontally),
                             style = MaterialTheme.typography.titleLarge
                         )
-                        options.forEachIndexed { index, item ->
+                        dialogOptions.forEachIndexed { index, item ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable { selectedOptionIndex = index },
+                                    .clickable { dialogOptionIndex = index },
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 RadioButton(
-                                    selected = index == selectedOptionIndex,
-                                    onClick = {selectedOptionIndex = index}
+                                    selected = index == dialogOptionIndex,
+                                    onClick = {dialogOptionIndex = index}
                                 )
                                 Spacer(modifier = Modifier.width(16.dp))
                                 Text(text = item)
                             }
                             Divider()
                         }
-                        Button(
-                            modifier = Modifier.align(Alignment.CenterHorizontally),
-                            onClick = {
-                                changeGenreText = true
-                                dialogOpen = false
-                            }) {
-                            Text(text = "Confirm")
+                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
+                            Column(verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally) {
+                                Button(
+                                    onClick = {
+                                        genreIdFromDialog = -1
+                                        dialogOpen = false
+                                    }
+                                ) {
+                                    Text(text = "Cancel")
+                                }
+                            }
+                            Column(verticalArrangement = Arrangement.SpaceEvenly, horizontalAlignment = Alignment.CenterHorizontally) {
+                                Button(
+                                    onClick = {
+                                        genreIdFromDialog = genreId
+                                        dialogOpen = false
+                                    }) {
+                                    Text(text = "Confirm")
+                                }
+                            }
                         }
                     }
                 }
@@ -84,7 +98,7 @@ fun SongSelection(navController: NavController){
                 ExtendedFloatingActionButton(
                     onClick = {
                         if(genreId != 0){
-                            navController.navigate(Screen.SongQueueWithoutArgs.route+"/${genreId}/${genreList[genreId]}/${numOfSongs.toInt()}")
+                            navController.navigate(Screen.SongQueueWithoutArgs.route+"/${genreId}/${GenreFactory.getGenreById(genreId)}/${numOfSongs.toInt()}")
                         }
                     },
                     text = { Text(text = "Add Songs") },
@@ -110,141 +124,49 @@ fun SongSelection(navController: NavController){
                     mainAxisSpacing = 8.dp,
                     mainAxisSize = SizeMode.Wrap
                 ) {
+                    genreIdList.map {curGenreId->
+                        FilterChip(
+                            selected = genreId == curGenreId && genreIdFromDialog == genreId,
+                            onClick = {
+                                genreId = curGenreId
+                                dialogOptions = GenreFactory.getSubGenresById(curGenreId)
+                                dialogOpen = true
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(GenreFactory.getGenreIcon(curGenreId)),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            label = {
+                                Text(text = if(genreId == curGenreId && genreIdFromDialog == genreId){
+                                        dialogOptions[dialogOptionIndex]
+                                    } else {
+                                        GenreFactory.getGenreById(curGenreId)
+                                    }
+                                )
+                            }
+                        )
+                    }
                     FilterChip(
-                        selected = genreList[genreId] == genreList[1] && changeGenreText,
+                        selected = false,
                         onClick = {
-                            dialogOpen = true
-                            if(genreList[genreId] == genreList[1]) genreId = 0
-                            else genreId = 1
+                            showAllGenres = !showAllGenres
+                            genreIdList =
+                                if(showAllGenres) GenreFactory.getAllGenreIds(genreIdList)
+                                else userPreferredGenreIds
                         },
                         leadingIcon = {
                             Icon(
-                                painter = painterResource(R.drawable.ic_guitar),
+                                painter = if(!showAllGenres) painterResource(R.drawable.ic_expand)
+                                    else painterResource(R.drawable.ic_collapse),
                                 contentDescription = null,
                                 modifier = Modifier.size(20.dp)
                             )
                         },
                         label = {
-                            Text(text = if(changeGenreText) options[selectedOptionIndex] else "Rock")
-                        }
-                    )
-                    FilterChip(
-                        selected = genreList[genreId] == genreList[2],
-                        onClick = {
-                            if(genreList[genreId] == genreList[2]) genreId = 0
-                            else genreId = 2
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_dance),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        label = {
-                            Text(text = "Dance")
-                        }
-                    )
-                    FilterChip(
-                        selected = genreList[genreId] == genreList[3],
-                        onClick = {
-                            if(genreList[genreId] == genreList[3]) genreId = 0
-                            else genreId = 3
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_relaxing),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        label = {
-                            Text(text = "Relaxing")
-                        }
-                    )
-                    FilterChip(
-                        selected = genreList[genreId] == genreList[4],
-                        onClick = {
-                            if(genreList[genreId] == genreList[4]) genreId = 0
-                            else genreId = 4
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_study),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        label = {
-                            Text(text = "Study")
-                        }
-                    )
-                    FilterChip(
-                        selected = genreList[genreId] == genreList[5],
-                        onClick = {
-                            if(genreList[genreId] == genreList[5]) genreId = 0
-                            else genreId = 5
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_electronic),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        label = {
-                            Text(text = "Electronic")
-                        }
-                    )
-                    FilterChip(
-                        selected = genreList[genreId] == genreList[6],
-                        onClick = {
-                            if(genreList[genreId] == genreList[6]) genreId = 0
-                            else genreId = 6
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_suspenseful),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        label = {
-                            Text(text = "Suspenseful")
-                        }
-                    )
-                    FilterChip(
-                        selected = genreList[genreId] == genreList[7],
-                        onClick = {
-                            if(genreList[genreId] == genreList[7]) genreId = 0
-                            else genreId = 7
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_workout),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        label = {
-                            Text(text = "Workout")
-                        }
-                    )
-                    FilterChip(
-                        selected = genreList[genreId] == genreList[8],
-                        onClick = {
-                            if(genreList[genreId] == genreList[8]) genreId = 0
-                            else genreId = 8
-                        },
-                        leadingIcon = {
-                            Icon(
-                                painter = painterResource(R.drawable.ic_dubstep),
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp)
-                            )
-                        },
-                        label = {
-                            Text(text = "Dubstep")
+                            Text(text = if(showAllGenres) "less" else "more" )
                         }
                     )
                 }

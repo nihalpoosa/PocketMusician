@@ -17,7 +17,7 @@ object GenreFactory {
     public fun getGenreById(id: Int) = genres[id]
     public fun getSubGenresById(id: Int) = subGenres[id]
 
-    public fun getSubGenreByIdAndOption(id: Int, dialogOption: Int) = subGenres[id][dialogOption]
+    public fun getSubGenreByIdAndOption(genreId: Int, subGenreId: Int) = subGenres[genreId][subGenreId]
     public fun getAllGenreIds(curGenreList: List<Int>): List<Int>{
         var allGenreList: List<Int> = curGenreList
         for(i in genres.indices){

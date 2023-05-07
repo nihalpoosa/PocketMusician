@@ -1,6 +1,5 @@
 package com.aimusic.pocketmusician.pages
 
-import com.aimusic.pocketmusician.R
 import android.media.MediaPlayer
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,9 +15,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.aimusic.pocketmusician.FirebaseInstance
-import com.aimusic.pocketmusician.RawSongList
-import com.aimusic.pocketmusician.Screen
+import com.aimusic.pocketmusician.*
+import com.aimusic.pocketmusician.R
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -27,13 +25,14 @@ import kotlin.math.roundToInt
 
 @ExperimentalMaterial3Api
 @Composable
-fun SongQueue(genreId: Int, genreType: String, numOfSongs: Int, navController: NavController){
+fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: NavController){
     // A surface container using the 'background' color from the theme
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        var songList = Array(numOfSongs) { i -> "$genreType song $i" }
+        var subGenreName = GenreFactory.getSubGenreByIdAndOption(genreId, subGenreId)
+        var songList = Array(numOfSongs) { i -> "$subGenreName song $i" }
         var rawSongList = RawSongList()
         rawSongList.initiateSongList()
         var genreToRawSongList = rawSongList.genreToSongList

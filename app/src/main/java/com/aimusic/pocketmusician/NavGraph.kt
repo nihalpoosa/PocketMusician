@@ -20,11 +20,11 @@ fun SetupNavGraph(navController: NavHostController){
             route = Screen.SongQueue.route,
             arguments = listOf(
                 navArgument("genreId") { type = NavType.IntType },
-                navArgument("genreType") { type = NavType.StringType },
+                navArgument("subGenreId") { type = NavType.IntType },
                 navArgument("numOfSongs") { type = NavType.IntType }
             )
         ){
-            SongQueue(it.arguments?.getInt("genreId")?: 1, it.arguments?.getString("genreType")?: "Default", it.arguments?.getInt("numOfSongs")?: 50, navController)
+            SongQueue(it.arguments?.getInt("genreId")?: 0, it.arguments?.getInt("subGenreId")?: 0, it.arguments?.getInt("numOfSongs")?: 50, navController)
         }
         composable(route = Screen.LoginPage.route){
             if (FirebaseInstance.getUser() != null){

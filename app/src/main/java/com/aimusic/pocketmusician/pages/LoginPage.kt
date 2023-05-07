@@ -60,7 +60,7 @@ fun LoginPage(navController: NavController) {
         Button(
             onClick = {
                 if(password.length < 6){
-                    Toast.makeText(context, "Password length should be at least 6", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Password length should be at least 6", Toast.LENGTH_SHORT).show()
                 }
                 else{
                     FirebaseInstance.authentication.signInWithEmailAndPassword(email, password).addOnCompleteListener {
@@ -68,7 +68,7 @@ fun LoginPage(navController: NavController) {
                             navController.navigate(Screen.SongSelection.route)
                         }
                         else{
-                            Toast.makeText(context, "Wrong email and password combination", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "Wrong email and password combination", Toast.LENGTH_SHORT).show()
                         }
                     }
                 }

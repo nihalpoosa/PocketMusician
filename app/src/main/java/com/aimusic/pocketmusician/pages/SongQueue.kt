@@ -71,7 +71,7 @@ fun SongQueue(genreId: Int, genreType: String, numOfSongs: Int, navController: N
                     },
                     actions = {
                         IconButton(onClick = {
-                            navController.navigate(Screen.UserPreferences.route)
+                            navController.navigate(Screen.UserPreferencesWithoutArgs.route+"/false")
                         }) {
                             Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = MaterialTheme.colorScheme.inverseOnSurface)
                         }

@@ -74,18 +74,17 @@ fun RegisterPage(navController: NavController){
         Button(
             onClick = {
                 if(password.length < 6){
-                    Toast.makeText(context, "Password length should be at least 6", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, "Password length should be at least 6", Toast.LENGTH_SHORT).show()
                 }
                 else{
                     FirebaseInstance.authentication.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
                         if (it.isSuccessful) {
-                            navController.navigate(Screen.UserPreferences.route)
+                            navController.navigate(Screen.UserPreferencesWithoutArgs.route+"/true")
                         }
                         else{
-                            Toast.makeText(context, "Couldn't create user", Toast.LENGTH_LONG).show()
+                            Toast.makeText(context, "Couldn't create user", Toast.LENGTH_SHORT).show()
                         }
                     }
-                    FirebaseInstance.authentication.signOut()
                 }
             },
             modifier = Modifier

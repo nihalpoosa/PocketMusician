@@ -1,10 +1,12 @@
 package com.aimusic.pocketmusician.pages
 
+import android.widget.Toast
 import com.aimusic.pocketmusician.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -17,15 +19,31 @@ import com.google.accompanist.flowlayout.SizeMode
 
 @ExperimentalMaterial3Api
 @Composable
-fun UserPreferences(navController: NavController){
+fun UserPreferences(newUser: Boolean, navController: NavController){
     // A surface container using the 'background' color from the theme
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
+        var genrePreferencesInDatabase:List<Int> = listOf()
+        var songDurationInDatabase = 5f
+        var numOfSongsInDatabase = 40f
+        if(!newUser){
+            var userPreferencesInDataBaseQuery = FirebaseInstance.database.collection("users").whereEqualTo("email", FirebaseInstance.getUser()?.email)
+            userPreferencesInDataBaseQuery.get()
+                .addOnSuccessListener {results->
+                    for (result in results){
+                        genrePreferencesInDatabase = result.data["preferences"] as List<Int>
+                        songDurationInDatabase = (result.data["songDuration"] as Double).toFloat()
+                        numOfSongsInDatabase = (result.data["numOfSongs"] as Double).toFloat()
+                    }
+                }
+        }
         var genreIdList = GenreFactory.getAllGenreIds(listOf())
-        var genrePreferences:List<Int> by remember{ mutableStateOf(listOf()) }
-        var numOfSongs by remember{ mutableStateOf(40f) }
+        var genrePreferences:List<Int> by remember{ mutableStateOf(genrePreferencesInDatabase) }
+        var songDuration by remember{ mutableStateOf(songDurationInDatabase) }
+        var numOfSongs by remember{ mutableStateOf(numOfSongsInDatabase) }
+        val context = LocalContext.current
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -41,16 +59,50 @@ fun UserPreferences(navController: NavController){
             floatingActionButton = {
                 ExtendedFloatingActionButton(
                     onClick = {
+                        val userEmail = FirebaseInstance.getUser()?.email
+                        FirebaseInstance.authentication.signOut()
                         if(genrePreferences.isNotEmpty()){
-                            
-                            // onSavePreferences() from +"/${genreId}/${genreList[genreId]}/${numOfSongs.toInt()}"
-                            if (FirebaseInstance.getUser() != null){
-                                navController.popBackStack()
+                            if(newUser){
+                                FirebaseInstance.database
+                                    .collection("users")
+                                    .add(hashMapOf(
+                                        "email" to userEmail,
+                                        "preferences" to genrePreferences,
+                                        "songDuration" to songDuration,
+                                        "numOfSongs" to numOfSongs
+                                    ))
+                                    .addOnSuccessListener {docref->
+                                        Toast.makeText(context, "User preferences saved", Toast.LENGTH_SHORT).show()
+                                        navController.navigate(Screen.LoginPage.route){
+                                            popUpTo(Screen.LoginPage.route){inclusive = true}
+                                        }
+                                    }
+                                    .addOnFailureListener {ex->
+                                        Toast.makeText(context, "Couldn't save user preferences", Toast.LENGTH_SHORT).show()
+                                    }
                             }
                             else{
-                                navController.navigate(Screen.LoginPage.route){
-                                    popUpTo(Screen.LoginPage.route){inclusive = true}
-                                }
+                                var userPreferencesInDataBaseQuery = FirebaseInstance.database.collection("users").whereEqualTo("email", userEmail)
+                                userPreferencesInDataBaseQuery.get()
+                                    .addOnSuccessListener {results->
+                                        val batch = FirebaseInstance.database.batch()
+                                        for (result in results){
+                                            batch.update(result.reference, "preferences", genrePreferences)
+                                            batch.update(result.reference, "songDuration", songDuration)
+                                            batch.update(result.reference, "numOfSongs", numOfSongs)
+                                        }
+                                        batch.commit()
+                                            .addOnSuccessListener {
+                                                Toast.makeText(context, "User preferences saved", Toast.LENGTH_SHORT).show()
+                                                navController.popBackStack()
+                                            }
+                                            .addOnFailureListener {
+                                                Toast.makeText(context, "Couldn't update user preferences", Toast.LENGTH_SHORT).show()
+                                            }
+                                    }
+                                    .addOnFailureListener {ex->
+                                        Toast.makeText(context, "Couldn't get user preferences to update", Toast.LENGTH_SHORT).show()
+                                    }
                             }
                         }
                     },
@@ -104,7 +156,6 @@ fun UserPreferences(navController: NavController){
 
                 Divider(color = MaterialTheme.colorScheme.inverseSurface)
 
-                var songDuration by remember{ mutableStateOf(5f) }
                 Text(
                     text = "${songDuration.toInt()} minutes per song",
                     style = MaterialTheme.typography.titleLarge

@@ -37,8 +37,13 @@ fun SetupNavGraph(navController: NavHostController){
         composable(route = Screen.RegisterPage.route){
             RegisterPage(navController)
         }
-        composable(route = Screen.UserPreferences.route){
-            UserPreferences(navController)
+        composable(
+            route = Screen.UserPreferences.route,
+            arguments = listOf(
+                navArgument("newUser") { type = NavType.BoolType },
+            )
+        ){
+            UserPreferences(it.arguments?.getBoolean("newUser")?: false, navController)
         }
     }
 }

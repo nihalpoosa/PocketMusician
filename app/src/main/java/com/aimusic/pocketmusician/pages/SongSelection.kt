@@ -29,11 +29,23 @@ fun SongSelection(navController: NavController){
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        var userPreferredGenreIds = listOf(3, 2, 1, 5, 6, 7)
-        var genreIdList by remember { mutableStateOf(userPreferredGenreIds) }
+        var genrePreferencesInDatabase:List<Int> = listOf(3, 2, 1, 5, 6, 7)
+        var songDurationInDatabase = 5f
+        var numOfSongsInDatabase = 40f
+        var userPreferencesInDataBaseQuery = FirebaseInstance.database.collection("users").whereEqualTo("email", FirebaseInstance.getUser()?.email)
+        userPreferencesInDataBaseQuery.get()
+            .addOnSuccessListener {results->
+                for (result in results){
+                    genrePreferencesInDatabase = result.data["preferences"] as List<Int>
+                    songDurationInDatabase = (result.data["songDuration"] as Double).toFloat()
+                    numOfSongsInDatabase = (result.data["numOfSongs"] as Double).toFloat()
+                }
+            }
+        var genreIdList by remember { mutableStateOf(genrePreferencesInDatabase) }
+        var songDuration by remember{ mutableStateOf(songDurationInDatabase) }
+        var numOfSongs by remember{ mutableStateOf(numOfSongsInDatabase) }
         var genreId by remember{ mutableStateOf(-1) }
         var genreIdFromDialog by remember{ mutableStateOf(-1) }
-        var numOfSongs by remember{ mutableStateOf(40f) }
         var dialogOptions by remember {mutableStateOf(listOf("Option 1", "Option 2", "Option 3", "Option 4"))}
         var dialogOptionIndex by remember { mutableStateOf(0) }
         var dialogOpen by remember { mutableStateOf(false) }
@@ -107,7 +119,7 @@ fun SongSelection(navController: NavController){
                     ),
                     actions = {
                         IconButton(onClick = {
-                            navController.navigate(Screen.UserPreferences.route)
+                            navController.navigate(Screen.UserPreferencesWithoutArgs.route+"/false")
                         }) {
                             Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = MaterialTheme.colorScheme.inverseOnSurface)
                         }
@@ -183,7 +195,7 @@ fun SongSelection(navController: NavController){
                             showAllGenres = !showAllGenres
                             genreIdList =
                                 if(showAllGenres) GenreFactory.getAllGenreIds(genreIdList)
-                                else userPreferredGenreIds
+                                else genrePreferencesInDatabase
                         },
                         leadingIcon = {
                             Icon(
@@ -202,7 +214,6 @@ fun SongSelection(navController: NavController){
 
                 Divider(color = MaterialTheme.colorScheme.inverseSurface)
 
-                var songDuration by remember{ mutableStateOf(5f) }
                 Text(
                     text = "${songDuration.toInt()} minutes per song",
                     style = MaterialTheme.typography.titleLarge

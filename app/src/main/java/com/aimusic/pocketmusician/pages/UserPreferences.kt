@@ -1,5 +1,6 @@
 package com.aimusic.pocketmusician.pages
 
+import android.util.Log
 import android.widget.Toast
 import com.aimusic.pocketmusician.R
 import androidx.compose.foundation.layout.*
@@ -20,27 +21,20 @@ import com.google.accompanist.flowlayout.SizeMode
 @ExperimentalMaterial3Api
 @Composable
 fun UserPreferences(newUser: Boolean, navController: NavController){
-    // A surface container using the 'background' color from the theme
-    Surface(
+    var genrePreferencesInDatabase:List<Int> by remember{ mutableStateOf(listOf()) }
+    var songDurationInDatabase by remember{ mutableStateOf(5f) }
+    var numOfSongsInDatabase by remember{ mutableStateOf(40f) }
+
+    var waitForTheNetworkCall by remember{ mutableStateOf(true) }
+    if(waitForTheNetworkCall) CircularProgressIndicator()
+    else Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        var genrePreferencesInDatabase:List<Int> = listOf()
-        var songDurationInDatabase = 5f
-        var numOfSongsInDatabase = 40f
-        if(!newUser){
-            var userPreferencesInDataBaseQuery = FirebaseInstance.database.collection("users").whereEqualTo("email", FirebaseInstance.getUser()?.email)
-            userPreferencesInDataBaseQuery.get()
-                .addOnSuccessListener {results->
-                    for (result in results){
-                        genrePreferencesInDatabase = result.data["preferences"] as List<Int>
-                        songDurationInDatabase = (result.data["songDuration"] as Double).toFloat()
-                        numOfSongsInDatabase = (result.data["numOfSongs"] as Double).toFloat()
-                    }
-                }
-        }
         var genreIdList = GenreFactory.getAllGenreIds(listOf())
+        Log.i("Usr Prf", genrePreferencesInDatabase.toString())
         var genrePreferences:List<Int> by remember{ mutableStateOf(genrePreferencesInDatabase) }
+        Log.i("Usr Prf", genrePreferences.toString())
         var songDuration by remember{ mutableStateOf(songDurationInDatabase) }
         var numOfSongs by remember{ mutableStateOf(numOfSongsInDatabase) }
         val context = LocalContext.current
@@ -60,9 +54,9 @@ fun UserPreferences(newUser: Boolean, navController: NavController){
                 ExtendedFloatingActionButton(
                     onClick = {
                         val userEmail = FirebaseInstance.getUser()?.email
-                        FirebaseInstance.authentication.signOut()
                         if(genrePreferences.isNotEmpty()){
                             if(newUser){
+                                FirebaseInstance.authentication.signOut()
                                 FirebaseInstance.database
                                     .collection("users")
                                     .add(hashMapOf(
@@ -184,6 +178,28 @@ fun UserPreferences(newUser: Boolean, navController: NavController){
                     steps = 98
                 )
             }
+        }
+    }
+
+    LaunchedEffect(Unit){
+        if(!newUser){
+            var userPreferencesInDataBaseQuery = FirebaseInstance.database.collection("users").whereEqualTo("email", FirebaseInstance.getUser()?.email)
+            userPreferencesInDataBaseQuery.get()
+                .addOnSuccessListener {results->
+                    for (result in results){
+                        genrePreferencesInDatabase = result.data["preferences"] as List<Int>
+                        Log.i("Usr Prf Net", genrePreferencesInDatabase.toString())
+                        songDurationInDatabase = (result.data["songDuration"] as Double).toFloat()
+                        numOfSongsInDatabase = (result.data["numOfSongs"] as Double).toFloat()
+                    }
+                    waitForTheNetworkCall = false
+                }
+                .addOnFailureListener {
+                    waitForTheNetworkCall = false
+                }
+        }
+        else{
+            waitForTheNetworkCall = false
         }
     }
 }

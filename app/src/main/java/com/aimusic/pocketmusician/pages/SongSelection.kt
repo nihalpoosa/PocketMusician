@@ -35,9 +35,7 @@ fun SongSelection(navController: NavController){
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-        Log.i("Sel", genrePreferencesInDatabase.toString())
-        var genreIdList by remember { mutableStateOf(genrePreferencesInDatabase) }
-        Log.i("Sel", genreIdList.toString())
+        var genreIdList by remember { mutableStateOf(genrePreferencesInDatabase.joinToString(separator = ",")) }
         var songDuration by remember{ mutableStateOf(songDurationInDatabase) }
         var numOfSongs by remember{ mutableStateOf(numOfSongsInDatabase) }
         var genreId by remember{ mutableStateOf(-1) }
@@ -159,8 +157,8 @@ fun SongSelection(navController: NavController){
                     modifier = Modifier.fillMaxWidth(),
                     mainAxisSpacing = 8.dp,
                     mainAxisSize = SizeMode.Wrap
-                ) {
-                    genreIdList.map {curGenreId->
+                ) { if(genreIdList.isNotEmpty())
+                    genreIdList.split(",").map{strId -> strId.toInt()}.map{curGenreId->
                         FilterChip(
                             selected = genreId == curGenreId && genreIdFromDialog == genreId,
                             onClick = {
@@ -190,8 +188,8 @@ fun SongSelection(navController: NavController){
                         onClick = {
                             showAllGenres = !showAllGenres
                             genreIdList =
-                                if(showAllGenres) GenreFactory.getAllGenreIds(genreIdList)
-                                else genrePreferencesInDatabase
+                                if(showAllGenres) GenreFactory.getAllGenreIds(if(genreIdList.isNotEmpty()) genreIdList.split(",").map{strId -> strId.toInt()} else listOf()).joinToString(separator = ",")
+                                else genrePreferencesInDatabase.joinToString(separator = ",")
                         },
                         leadingIcon = {
                             Icon(
@@ -248,11 +246,10 @@ fun SongSelection(navController: NavController){
             .addOnSuccessListener {results->
                 for (result in results){
                     genrePreferencesInDatabase = result.data["preferences"] as List<Int>
-                    Log.i("Sel Net", genrePreferencesInDatabase.toString())
                     songDurationInDatabase = (result.data["songDuration"] as Double).toFloat()
                     numOfSongsInDatabase = (result.data["numOfSongs"] as Double).toFloat()
-                    waitForTheNetworkCall = false
                 }
+                waitForTheNetworkCall = false
             }
             .addOnFailureListener {
                 waitForTheNetworkCall = false

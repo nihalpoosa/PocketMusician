@@ -32,9 +32,7 @@ fun UserPreferences(newUser: Boolean, navController: NavController){
         color = MaterialTheme.colorScheme.background
     ) {
         var genreIdList = GenreFactory.getAllGenreIds(listOf())
-        Log.i("Usr Prf", genrePreferencesInDatabase.toString())
-        var genrePreferences:List<Int> by remember{ mutableStateOf(genrePreferencesInDatabase) }
-        Log.i("Usr Prf", genrePreferences.toString())
+        var genrePreferences by remember{ mutableStateOf(genrePreferencesInDatabase.joinToString(",")) }
         var songDuration by remember{ mutableStateOf(songDurationInDatabase) }
         var numOfSongs by remember{ mutableStateOf(numOfSongsInDatabase) }
         val context = LocalContext.current
@@ -56,12 +54,13 @@ fun UserPreferences(newUser: Boolean, navController: NavController){
                         val userEmail = FirebaseInstance.getUser()?.email
                         if(genrePreferences.isNotEmpty()){
                             if(newUser){
+                                Log.i("New user", userEmail.toString())
                                 FirebaseInstance.authentication.signOut()
                                 FirebaseInstance.database
                                     .collection("users")
                                     .add(hashMapOf(
                                         "email" to userEmail,
-                                        "preferences" to genrePreferences,
+                                        "preferences" to genrePreferences.split(","),
                                         "songDuration" to songDuration,
                                         "numOfSongs" to numOfSongs
                                     ))
@@ -81,7 +80,7 @@ fun UserPreferences(newUser: Boolean, navController: NavController){
                                     .addOnSuccessListener {results->
                                         val batch = FirebaseInstance.database.batch()
                                         for (result in results){
-                                            batch.update(result.reference, "preferences", genrePreferences)
+                                            batch.update(result.reference, "preferences", genrePreferences.split(","))
                                             batch.update(result.reference, "songDuration", songDuration)
                                             batch.update(result.reference, "numOfSongs", numOfSongs)
                                         }
@@ -125,13 +124,16 @@ fun UserPreferences(newUser: Boolean, navController: NavController){
                 ) {
                     genreIdList.map {curGenreId->
                         FilterChip(
-                            selected = genrePreferences.contains(curGenreId),
+                            selected = if(genrePreferences.isNotEmpty()) genrePreferences.split(",").map{strId -> strId.toInt()}.contains(curGenreId) else false,
                             onClick = {
                                 genrePreferences =
-                                    if(genrePreferences.contains(curGenreId))
-                                        genrePreferences.minus(curGenreId)
+                                    if (genrePreferences.isNotEmpty())
+                                        if(genrePreferences.split(",").map{strId -> strId.toInt()}.contains(curGenreId))
+                                            genrePreferences.split(",").map{strId -> strId.toInt()}.minus(curGenreId).joinToString(separator = ",")
+                                        else
+                                            genrePreferences.split(",").map{strId -> strId.toInt()}.plus(curGenreId).joinToString(separator = ",")
                                     else
-                                        genrePreferences.plus(curGenreId)
+                                        curGenreId.toString()
                             },
                             leadingIcon = {
                                 Icon(
@@ -188,7 +190,6 @@ fun UserPreferences(newUser: Boolean, navController: NavController){
                 .addOnSuccessListener {results->
                     for (result in results){
                         genrePreferencesInDatabase = result.data["preferences"] as List<Int>
-                        Log.i("Usr Prf Net", genrePreferencesInDatabase.toString())
                         songDurationInDatabase = (result.data["songDuration"] as Double).toFloat()
                         numOfSongsInDatabase = (result.data["numOfSongs"] as Double).toFloat()
                     }

@@ -19,14 +19,12 @@ object GenreFactory {
     public fun getGenreById(id: Int) = genres[id]
     public fun getSubGenresById(id: Int) = subGenres[id]
     public fun getAllGenreIds(curGenreList: List<Int>): List<Int>{
-        Log.i("Fac beg", curGenreList.toString())
         var allGenreList: List<Int> = curGenreList
         for(i in genres.indices){
             if(!allGenreList.contains(i)){
                 allGenreList = allGenreList.plus(i)
             }
         }
-        Log.i("Fac end", allGenreList.toString())
         return allGenreList
     }
     public fun getGenreIcon(id: Int) = genreIcons[id]

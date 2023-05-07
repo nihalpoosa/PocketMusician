@@ -131,7 +131,7 @@ fun SongSelection(navController: NavController){
             floatingActionButton = {
                 ExtendedFloatingActionButton(
                     onClick = {
-                        if(genreId != 0){
+                        if(genreId != -1){
                             navController.navigate(Screen.SongQueueWithoutArgs.route+"/${genreId}/${GenreFactory.getGenreById(genreId)}/${numOfSongs.toInt()}")
                         }
                     },

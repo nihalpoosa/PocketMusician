@@ -132,7 +132,7 @@ fun SongSelection(navController: NavController){
                 ExtendedFloatingActionButton(
                     onClick = {
                         if(genreId != -1){
-                            navController.navigate(Screen.SongQueueWithoutArgs.route+"/${genreId}/${GenreFactory.getGenreById(genreId)}/${numOfSongs.toInt()}")
+                            navController.navigate(Screen.SongQueueWithoutArgs.route+"/${genreId}/${GenreFactory.getSubGenreByIdAndOption(genreId, dialogOptionIndex)}/${numOfSongs.toInt()}")
                         }
                     },
                     text = { Text(text = "Add Songs") },

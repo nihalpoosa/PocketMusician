@@ -1,4 +1,4 @@
-package com.aimusic.pocketmusician.components
+package com.aimusic.pocketmusician.pages
 
 import com.aimusic.pocketmusician.R
 import android.media.MediaPlayer
@@ -16,9 +16,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.aimusic.pocketmusician.FirebaseInstance
 import com.aimusic.pocketmusician.RawSongList
 import com.aimusic.pocketmusician.Screen
-import com.aimusic.pocketmusician.ui.theme.PocketMusicianTheme
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
@@ -64,18 +64,23 @@ fun SongQueue(genreId: Int, genreType: String, numOfSongs: Int, navController: N
                                 mediaPlayer.stop()
                                 mediaPlayer.release()
                             }
-                            navController.navigate(Screen.SongSelection.route){
-                                popUpTo(Screen.SongSelection.route){inclusive = true}
-                            }
+                            navController.popBackStack()
                         }) {
                             Icon(Icons.Filled.ArrowBack, contentDescription = "Back to selection", tint = MaterialTheme.colorScheme.inverseOnSurface)
                         }
                     },
                     actions = {
-                        IconButton(onClick = { /* Handle action icon click */ }) {
+                        IconButton(onClick = {
+                            navController.navigate(Screen.UserPreferences.route)
+                        }) {
                             Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = MaterialTheme.colorScheme.inverseOnSurface)
                         }
-                        IconButton(onClick = { /* Handle action icon click */ }) {
+                        IconButton(onClick = {
+                            FirebaseInstance.authentication.signOut()
+                            navController.navigate(Screen.LoginPage.route){
+                                popUpTo(Screen.LoginPage.route){inclusive = true}
+                            }
+                        }) {
                             Icon(painter = painterResource(id = R.drawable.ic_logout), contentDescription = "Logout", tint = MaterialTheme.colorScheme.inverseOnSurface)
                         }
                     }

@@ -18,7 +18,7 @@ object GenreFactory {
     public fun getSubGenresById(id: Int) = subGenres[id]
     public fun getAllGenreIds(curGenreList: List<Int>): List<Int>{
         var allGenreList: List<Int> = curGenreList
-        for(i in 0..8){
+        for(i in genres.indices){
             if(!allGenreList.contains(i)){
                 allGenreList = allGenreList.plus(i)
             }

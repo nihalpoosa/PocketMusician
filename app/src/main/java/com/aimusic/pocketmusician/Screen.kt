@@ -6,6 +6,6 @@ sealed class Screen(val route: String){
     object SongSelection: Screen("song_selection")
     object LoginPage: Screen("login_page")
     object RegisterPage: Screen("register_page")
-    object RegistrationPreferences: Screen("registration_preferences")
+    object UserPreferences: Screen("user_preferences")
 
 }

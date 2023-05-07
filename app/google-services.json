@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1058647395456",
+    "project_id": "pocketmusician-7dc73",
+    "storage_bucket": "pocketmusician-7dc73.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1058647395456:android:d5be4d4caf1f7753b1ea65",
+        "android_client_info": {
+          "package_name": "com.aimusic.pocketmusician"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1058647395456-etlrb0pdtggh7heba83hqj9sucvh6261.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAYO_PTxB8-7cxyb6ckjMvoDB5educ6UyM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1058647395456-etlrb0pdtggh7heba83hqj9sucvh6261.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

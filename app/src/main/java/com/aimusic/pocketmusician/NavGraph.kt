@@ -7,7 +7,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import com.aimusic.pocketmusician.components.*
+import com.aimusic.pocketmusician.pages.*
 
 @ExperimentalMaterial3Api
 @Composable
@@ -27,13 +27,18 @@ fun SetupNavGraph(navController: NavHostController){
             SongQueue(it.arguments?.getInt("genreId")?: 1, it.arguments?.getString("genreType")?: "Default", it.arguments?.getInt("numOfSongs")?: 50, navController)
         }
         composable(route = Screen.LoginPage.route){
-            LoginPage(navController)
+            if (FirebaseInstance.getUser() != null){
+                SongSelection(navController)
+            }
+            else{
+                LoginPage(navController)
+            }
         }
         composable(route = Screen.RegisterPage.route){
             RegisterPage(navController)
         }
-        composable(route = Screen.RegistrationPreferences.route){
-            RegistrationPreferences(navController)
+        composable(route = Screen.UserPreferences.route){
+            UserPreferences(navController)
         }
     }
 }

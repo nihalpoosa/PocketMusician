@@ -1,5 +1,6 @@
-package com.aimusic.pocketmusician.components
+package com.aimusic.pocketmusician.pages
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -9,11 +10,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.aimusic.pocketmusician.FirebaseInstance
 import com.aimusic.pocketmusician.Screen
 
 @ExperimentalMaterial3Api
@@ -67,10 +70,23 @@ fun RegisterPage(navController: NavController){
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        val context = LocalContext.current
         Button(
             onClick = {
-//                onRegisterClick()
-                navController.navigate(Screen.RegistrationPreferences.route)
+                if(password.length < 6){
+                    Toast.makeText(context, "Password length should be at least 6", Toast.LENGTH_LONG).show()
+                }
+                else{
+                    FirebaseInstance.authentication.createUserWithEmailAndPassword(email, password).addOnCompleteListener {
+                        if (it.isSuccessful) {
+                            navController.navigate(Screen.UserPreferences.route)
+                        }
+                        else{
+                            Toast.makeText(context, "Couldn't create user", Toast.LENGTH_LONG).show()
+                        }
+                    }
+                    FirebaseInstance.authentication.signOut()
+                }
             },
             modifier = Modifier
                 .fillMaxWidth()

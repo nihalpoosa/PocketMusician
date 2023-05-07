@@ -54,8 +54,6 @@ fun UserPreferences(newUser: Boolean, navController: NavController){
                         val userEmail = FirebaseInstance.getUser()?.email
                         if(genrePreferences.isNotEmpty()){
                             if(newUser){
-                                Log.i("New user", userEmail.toString())
-                                FirebaseInstance.authentication.signOut()
                                 FirebaseInstance.database
                                     .collection("users")
                                     .add(hashMapOf(

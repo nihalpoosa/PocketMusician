@@ -10,7 +10,7 @@ object GenreFactory {
         listOf("Focus", "Coding", "Reading", "Writing"),
         listOf("EDM", "Techno", "Synthwave", "Trance"),
         listOf("Tension Building", "Crescendo", "Mysterious"),
-        listOf("EDM", "House music", "South Indian", "Bollywood"),
+        listOf("EDM", "House music", "High BPM", "Bollywood"),
         listOf("Glitch Hop", "Drum and Bass", "Deathstep"),
         listOf("Bebop", "Free Jazz")
     )

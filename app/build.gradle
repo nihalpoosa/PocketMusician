@@ -1,6 +1,7 @@
 plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.10'
 }
 
 android {
@@ -67,5 +68,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     implementation 'com.google.firebase:firebase-core:9.6.1'
     implementation 'com.google.firebase:firebase-firestore-ktx:24.6.0'
+    implementation 'io.coil-kt:coil-compose:2.3.0'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0'
 }
 apply plugin: 'com.google.gms.google-services'

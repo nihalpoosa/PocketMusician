@@ -1,6 +1,7 @@
 package com.aimusic.pocketmusician.pages
 
 import android.media.MediaPlayer
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,19 +19,27 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.aimusic.pocketmusician.*
 import com.aimusic.pocketmusician.R
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.*
 import kotlin.math.roundToInt
+import java.net.HttpURLConnection
+import java.net.URL
+import javax.net.ssl.HttpsURLConnection
+import kotlin.random.Random
 
 @ExperimentalMaterial3Api
 @Composable
 fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: NavController){
-    // A surface container using the 'background' color from the theme
-    Surface(
+    var waitForTheNetworkCall by remember{ mutableStateOf(true) }
+    var useDefaultBackground by remember{ mutableStateOf(false) }
+    var backgroundImageUrl by remember{ mutableStateOf("") }
+    if(waitForTheNetworkCall) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+    else Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
@@ -73,12 +82,22 @@ fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: Nav
                     },
                     actions = {
                         IconButton(onClick = {
+                            if(mediaPlayerInitialized) {
+                                coroutineJob.cancel()
+                                mediaPlayer.stop()
+                                mediaPlayer.release()
+                            }
                             navController.navigate(Screen.UserPreferencesWithoutArgs.route+"/false")
                         }) {
                             Icon(Icons.Filled.Settings, contentDescription = "Settings", tint = MaterialTheme.colorScheme.inverseOnSurface)
                         }
                         IconButton(onClick = {
                             FirebaseInstance.authentication.signOut()
+                            if(mediaPlayerInitialized) {
+                                coroutineJob.cancel()
+                                mediaPlayer.stop()
+                                mediaPlayer.release()
+                            }
                             navController.navigate(Screen.LoginPage.route){
                                 popUpTo(Screen.LoginPage.route){inclusive = true}
                             }
@@ -230,7 +249,10 @@ fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: Nav
             }
         ){values ->
             Image(
-                painter = painterResource(id = R.drawable.bckground_image),
+                painter =
+                    if(useDefaultBackground)
+                        painterResource(R.drawable.default_background_image)
+                    else rememberAsyncImagePainter(backgroundImageUrl),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop
@@ -292,6 +314,26 @@ fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: Nav
                     )
                     Divider(color = MaterialTheme.colorScheme.inverseSurface)
                 }
+            }
+        }
+    }
+
+    LaunchedEffect(Unit){
+        withContext(Dispatchers.IO) {
+            try {
+                val connection = URL(BackgroundImageSearchQuery.create(genreId, subGenreId)).openConnection() as HttpsURLConnection
+                connection.requestMethod = "GET"
+                if (connection.responseCode == HttpsURLConnection.HTTP_OK) {
+                    val jsonString = connection.inputStream.bufferedReader().use { it.readText() }
+                    val apiResponse = Json { ignoreUnknownKeys = true }.decodeFromString<APIResponse>(jsonString)
+                    backgroundImageUrl = apiResponse.results[Random.nextInt(0,10)].urls.regular
+                } else {
+                    throw Exception("HTTPS request failed")
+                }
+            }catch (e: Exception) {
+                useDefaultBackground = true
+            } finally {
+                waitForTheNetworkCall = false
             }
         }
     }

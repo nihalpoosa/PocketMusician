@@ -1,6 +1,8 @@
 package com.aimusic.pocketmusician.pages
 
 import android.media.MediaPlayer
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -11,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -226,7 +229,13 @@ fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: Nav
                 }
             }
         ){values ->
-            LazyColumn(contentPadding = values){
+            Image(
+                painter = painterResource(id = R.drawable.bckground_image),
+                contentDescription = null,
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
+            )
+            LazyColumn(contentPadding = values, modifier = Modifier.background(color = Color.Transparent)){
                 items(songList.size) {
                     var listItemContainerColor =
                         if (it == selectedSongId) MaterialTheme.colorScheme.surface
@@ -237,7 +246,7 @@ fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: Nav
                     ListItem(
                         headlineText = { Text(songList[it]) },
                         colors = ListItemDefaults.colors(
-                            containerColor = listItemContainerColor,
+                            containerColor = listItemContainerColor.copy(alpha = 0.7f),
                             headlineColor = listItemHeadlineColor
                         ),
                         modifier = Modifier.clickable {

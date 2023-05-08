@@ -30,7 +30,7 @@ fun SongSelection(navController: NavController){
     var numOfSongsInDatabase by remember{ mutableStateOf(40f) }
 
     var waitForTheNetworkCall by remember{ mutableStateOf(true) }
-    if(waitForTheNetworkCall) CircularProgressIndicator()
+    if(waitForTheNetworkCall) LinearProgressIndicator()
     else Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background

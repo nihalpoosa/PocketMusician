@@ -331,6 +331,7 @@ fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: Nav
                     throw Exception("HTTPS request failed")
                 }
             }catch (e: Exception) {
+                Log.i("exception", "${e.message}")
                 useDefaultBackground = true
             } finally {
                 waitForTheNetworkCall = false

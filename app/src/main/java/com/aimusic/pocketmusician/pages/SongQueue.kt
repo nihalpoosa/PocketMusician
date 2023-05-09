@@ -32,12 +32,18 @@ import java.net.URL
 import javax.net.ssl.HttpsURLConnection
 import kotlin.random.Random
 
+/*
+    This is a composable function for the song queue page. This takes in the genre id, subgenre id
+    and number of songs from song selection page and creates the views for the activity of song
+    queue.
+ */
 @ExperimentalMaterial3Api
 @Composable
 fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: NavController){
-    var waitForTheNetworkCall by remember{ mutableStateOf(true) }
-    var useDefaultBackground by remember{ mutableStateOf(false) }
-    var backgroundImageUrl by remember{ mutableStateOf("") }
+    var waitForTheNetworkCall by remember{ mutableStateOf(true) } // Variable to wait for the network call used for user preferences
+    var useDefaultBackground by remember{ mutableStateOf(false) } // if set to true uses default image to show in case the unspalsh api fails to retrive an image
+    var backgroundImageUrl by remember{ mutableStateOf("") } // stores the background image url when the call to unsplash api succeeds
+    // Until the network call is done show the linear progress bar on top else show the song queue
     if(waitForTheNetworkCall) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
     else Surface(
         modifier = Modifier.fillMaxSize(),
@@ -160,7 +166,7 @@ fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: Nav
                                         if (selectedSongId == -1) selectedSongId = songList.size-1
                                         mediaPlayer.stop()
                                         mediaPlayer.release()
-                                        mediaPlayer = MediaPlayer.create(context, genreToRawSongList[genreId]!![selectedSongId%12])
+                                        mediaPlayer = MediaPlayer.create(context, genreToRawSongList[genreId]!![selectedSongId%4])
                                         positionInSong = 0
                                         durationOfSong = mediaPlayer.duration
                                         if(isPlaying) mediaPlayer.start()
@@ -200,7 +206,7 @@ fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: Nav
                                             mediaPlayer.stop()
                                             mediaPlayer.release()
                                         }
-                                        mediaPlayer = MediaPlayer.create(context, genreToRawSongList[genreId]!![selectedSongId%12])
+                                        mediaPlayer = MediaPlayer.create(context, genreToRawSongList[genreId]!![selectedSongId%4])
                                         positionInSong = 0
                                         durationOfSong = mediaPlayer.duration
                                         mediaPlayer.start()
@@ -231,7 +237,7 @@ fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: Nav
                                         if (selectedSongId == songList.size) selectedSongId = 0
                                         mediaPlayer.stop()
                                         mediaPlayer.release()
-                                        mediaPlayer = MediaPlayer.create(context, genreToRawSongList[genreId]!![selectedSongId%12])
+                                        mediaPlayer = MediaPlayer.create(context, genreToRawSongList[genreId]!![selectedSongId%4])
                                         positionInSong = 0
                                         durationOfSong = mediaPlayer.duration
                                         if(isPlaying) mediaPlayer.start()
@@ -281,7 +287,7 @@ fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: Nav
                                 mediaPlayer.stop()
                                 mediaPlayer.release()
                             }
-                            mediaPlayer = MediaPlayer.create(context, genreToRawSongList[genreId]!![selectedSongId%12])
+                            mediaPlayer = MediaPlayer.create(context, genreToRawSongList[genreId]!![selectedSongId%4])
                             positionInSong = 0
                             durationOfSong = mediaPlayer.duration
                             mediaPlayer.start()

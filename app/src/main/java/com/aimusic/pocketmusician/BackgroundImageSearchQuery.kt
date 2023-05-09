@@ -2,6 +2,11 @@ package com.aimusic.pocketmusician
 
 import kotlin.random.Random
 
+/*
+    This class generates the url query based on the genre and subgenre the user has selected.
+    This saves the api key and the url to hit to generate the random background image
+    when the user selects a particular subgenre
+ */
 object BackgroundImageSearchQuery {
     val apiUrl = "https://api.unsplash.com/search/photos?page=PAGENUMBER&query=QUERY&client_id=qnJf7eJs9r_XHlMYqatKeoqphLmANRJnkIyK5JKdf_0"
     fun create(genreId: Int, subGenreId: Int): String{

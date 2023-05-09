@@ -20,6 +20,10 @@ import androidx.navigation.NavController
 import com.aimusic.pocketmusician.FirebaseInstance
 import com.aimusic.pocketmusician.Screen
 
+/*
+    This is a composable function for the login page. This is displayed if the user logs out
+    or enters the app for the first time
+ */
 @ExperimentalMaterial3Api
 @Composable
 fun LoginPage(navController: NavController) {
@@ -60,6 +64,7 @@ fun LoginPage(navController: NavController) {
         Button(
             onClick = {
                 if(password.length < 6){
+                    // Validation checks
                     Toast.makeText(context, "Password length should be at least 6", Toast.LENGTH_SHORT).show()
                 }
                 else{

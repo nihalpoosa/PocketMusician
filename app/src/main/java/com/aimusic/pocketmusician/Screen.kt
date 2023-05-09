@@ -1,5 +1,9 @@
 package com.aimusic.pocketmusician
 
+/*
+    This is a case class that used to get the screen route instead of defining these variables
+    as raw strings and to make the code more readable
+ */
 sealed class Screen(val route: String){
     object SongQueueWithoutArgs: Screen("song_queue")
     object SongQueue: Screen("song_queue/{genreId}/{subGenreId}/{numOfSongs}")

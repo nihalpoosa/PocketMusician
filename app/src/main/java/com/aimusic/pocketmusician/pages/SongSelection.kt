@@ -26,6 +26,10 @@ import kotlinx.serialization.json.Json
 import java.net.HttpURLConnection
 import java.net.URL
 
+/*
+    This is a composable function for the song selection page. From this page user selects the user
+    preferences when adding new songs. This is the home page if the user is logged in.
+ */
 @ExperimentalMaterial3Api
 @Composable
 fun SongSelection(navController: NavController){
@@ -34,21 +38,24 @@ fun SongSelection(navController: NavController){
     var numOfSongsInDatabase by remember{ mutableStateOf(40f) }
 
     var waitForTheNetworkCall by remember{ mutableStateOf(true) }
+    // wait for the network call to get finished so that we know what user preferences to show
+    // till then just display the linear progress bar on top
     if(waitForTheNetworkCall) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
     else Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
         var genreIdList by remember { mutableStateOf(genrePreferencesInDatabase.joinToString(separator = ",")) }
-        var songDuration by remember{ mutableStateOf(songDurationInDatabase) }
-        var numOfSongs by remember{ mutableStateOf(numOfSongsInDatabase) }
-        var genreId by remember{ mutableStateOf(-1) }
-        var genreIdFromDialog by remember{ mutableStateOf(-1) }
-        var dialogOptions by remember {mutableStateOf(listOf("Option 1", "Option 2", "Option 3", "Option 4"))}
-        var dialogOptionIndex by remember { mutableStateOf(0) }
-        var dialogOpen by remember { mutableStateOf(false) }
-        var showAllGenres by remember{ mutableStateOf(false) }
+        var songDuration by remember{ mutableStateOf(songDurationInDatabase) } // variable to store the song duration
+        var numOfSongs by remember{ mutableStateOf(numOfSongsInDatabase) } // variable to store the number of songs to be added
+        var genreId by remember{ mutableStateOf(-1) } // the genre id to be passed to next song
+        var genreIdFromDialog by remember{ mutableStateOf(-1) } // the sub genre id to be passed to next song
+        var dialogOptions by remember {mutableStateOf(listOf("Option 1", "Option 2", "Option 3", "Option 4"))} // variable to store the subgenres
+        var dialogOptionIndex by remember { mutableStateOf(0) } // index into the subgenre radio buttons
+        var dialogOpen by remember { mutableStateOf(false) } // A variable used to pop up the subgenres when a genre is selected
+        var showAllGenres by remember{ mutableStateOf(false) } // a variable used to show all genres or only the user preferred genres
 
+        // pop up the dialog whenever a genre is selected
         if (dialogOpen){
             AlertDialog(
                 onDismissRequest = {
@@ -244,6 +251,7 @@ fun SongSelection(navController: NavController){
 
     }
 
+    // A call to get the user preferences from the firebase database
     LaunchedEffect(Unit){
         var userPreferencesInDataBaseQuery = FirebaseInstance.database.collection("users").whereEqualTo("email", FirebaseInstance.getUser()?.email)
         userPreferencesInDataBaseQuery.get()

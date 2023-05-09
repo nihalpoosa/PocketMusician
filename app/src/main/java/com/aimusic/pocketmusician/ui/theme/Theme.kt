@@ -16,6 +16,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.ViewCompat
 
+/*
+    This file is where the theme of the app is defined
+ */
+
+// select dark theme color scheme for the devices which are older than android 13
+// as they don't support material 3
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
     secondary = PurpleGrey80,
@@ -29,6 +35,8 @@ private val DarkColorScheme = darkColorScheme(
     onSurface = Color(0xFF1C1B1F),
 )
 
+// select light theme color scheme for the devices which are older than android 13
+// as they don't support material 3
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
@@ -49,6 +57,9 @@ fun PocketMusicianTheme(
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    // set the theme to material theme if the os supports material 3 else set it to the default theme
+    // which are defined above
+    // If material theme is not supported select the color scheme based on if it's in dark mode or light mode
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current

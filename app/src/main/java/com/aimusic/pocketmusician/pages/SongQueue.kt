@@ -53,16 +53,16 @@ fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: Nav
         var songList = Array(numOfSongs) { i -> "$subGenreName song $i" }
         var rawSongList = RawSongList()
         rawSongList.initiateSongList()
-        var genreToRawSongList = rawSongList.genreToSongList
+        var genreToRawSongList = rawSongList.genreToSongList // An array that is used to get the raw songs
         var selectedSongId by remember{ mutableStateOf(-10) }
         var someSongSelected by remember{ mutableStateOf(false) }
-        var isPlaying by remember{ mutableStateOf(false) }
-        var mediaPlayer = MediaPlayer()
+        var isPlaying by remember{ mutableStateOf(false) } // a variable to store if the music is playing
+        var mediaPlayer = MediaPlayer() // the media player instance which is used everywhere to play the music
         var mediaPlayerInitialized = false
         var context = LocalContext.current
-        var positionInSong by remember{ mutableStateOf(0) }
-        var durationOfSong by remember{ mutableStateOf(100) }
-        lateinit var coroutineJob: Job
+        var positionInSong by remember{ mutableStateOf(0) } // position of the seekbar
+        var durationOfSong by remember{ mutableStateOf(100) } // duration of the song
+        lateinit var coroutineJob: Job // a coroutine job which updates the seekbar position as the song progresses
         val composableScope = rememberCoroutineScope()
         Scaffold(
             topBar = {
@@ -326,6 +326,7 @@ fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: Nav
         }
     }
 
+    // A call to the background image search api
     LaunchedEffect(Unit){
         withContext(Dispatchers.IO) {
             try {

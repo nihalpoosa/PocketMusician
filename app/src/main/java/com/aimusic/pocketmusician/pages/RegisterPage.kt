@@ -19,6 +19,9 @@ import androidx.navigation.NavController
 import com.aimusic.pocketmusician.FirebaseInstance
 import com.aimusic.pocketmusician.Screen
 
+/*
+    This is a composable function for the registration page. This is displayed if the user is new.
+ */
 @ExperimentalMaterial3Api
 @Composable
 fun RegisterPage(navController: NavController){
@@ -74,6 +77,7 @@ fun RegisterPage(navController: NavController){
         Button(
             onClick = {
                 if(password.length < 6){
+                    // Appropriate validation checks
                     Toast.makeText(context, "Password length should be at least 6", Toast.LENGTH_SHORT).show()
                 }
                 else{
@@ -82,6 +86,7 @@ fun RegisterPage(navController: NavController){
                             navController.navigate(Screen.UserPreferencesWithoutArgs.route+"/true")
                         }
                         else{
+                            // Appropriate validation checks
                             Toast.makeText(context, "Couldn't create user", Toast.LENGTH_SHORT).show()
                         }
                     }
@@ -90,7 +95,7 @@ fun RegisterPage(navController: NavController){
             modifier = Modifier
                 .fillMaxWidth()
                 .height(56.dp),
-            enabled = password == confirmPassword && password != "" && email != ""
+            enabled = password == confirmPassword && password != "" && email != "" // enabled only of the password matches the confirm password
         ) {
             Text(
                 text = "Create Account",

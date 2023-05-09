@@ -1,5 +1,9 @@
 package com.aimusic.pocketmusician
 
+/*
+    This class is responsible for getting the raw file that is corresponding to the genre and
+    subgenre user has selected. Every genre has 4 mp3 songs associated with it
+ */
 class RawSongList {
     var genreToSongList = HashMap<Int, Array<Int>>()
     fun initiateSongList(){

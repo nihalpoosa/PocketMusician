@@ -1,5 +1,6 @@
 package com.aimusic.pocketmusician
 
+
 object GenreFactory {
     var genres = listOf("Rock", "Dance", "Relaxing", "Study", "Electronic", "Suspenseful", "Workout", "Dubstep", "Jazz")
     var genreIcons = listOf(R.drawable.ic_guitar, R.drawable.ic_dance, R.drawable.ic_relaxing, R.drawable.ic_study, R.drawable.ic_electronic, R.drawable.ic_suspenseful, R.drawable.ic_workout, R.drawable.ic_dubstep, R.drawable.ic_jazz)

@@ -17,15 +17,20 @@ import com.aimusic.pocketmusician.Screen
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.flowlayout.SizeMode
 
-
+/*
+    This is a composable function for the user preferences page. This shows no preferences if the
+    user is new and if the user is logged in it shows their preferences.
+ */
 @ExperimentalMaterial3Api
 @Composable
 fun UserPreferences(newUser: Boolean, navController: NavController){
-    var genrePreferencesInDatabase:List<Int> by remember{ mutableStateOf(listOf()) }
-    var songDurationInDatabase by remember{ mutableStateOf(5f) }
-    var numOfSongsInDatabase by remember{ mutableStateOf(40f) }
+    var genrePreferencesInDatabase:List<Int> by remember{ mutableStateOf(listOf()) } // a variable to be updated once the user genres are retrieved from the database
+    var songDurationInDatabase by remember{ mutableStateOf(5f) } // a variable to be updated once the user saved song duration is retrieved from the database
+    var numOfSongsInDatabase by remember{ mutableStateOf(40f) } // a variable to be updated once the user saved number of songs is retrieved from the database
 
     var waitForTheNetworkCall by remember{ mutableStateOf(true) }
+    // wait for the network call to get finished so that we know what user preferences to show
+    // till then just display the linear progress bar on top
     if(waitForTheNetworkCall) LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
     else Surface(
         modifier = Modifier.fillMaxSize(),
@@ -181,6 +186,7 @@ fun UserPreferences(newUser: Boolean, navController: NavController){
         }
     }
 
+    // A call to get the user preferences from the firebase database
     LaunchedEffect(Unit){
         if(!newUser){
             var userPreferencesInDataBaseQuery = FirebaseInstance.database.collection("users").whereEqualTo("email", FirebaseInstance.getUser()?.email)

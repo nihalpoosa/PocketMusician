@@ -10,6 +10,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.aimusic.pocketmusician.ui.theme.*
 
+/*
+    The main activity. This just displays the navigation controller,
+    all the content and navigation happens in the NavGraph class
+ */
 class MainActivity : ComponentActivity() {
 
     lateinit var navController: NavHostController

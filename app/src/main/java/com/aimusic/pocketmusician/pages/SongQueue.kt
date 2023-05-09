@@ -129,7 +129,9 @@ fun SongQueue(genreId: Int, subGenreId: Int, numOfSongs: Int, navController: Nav
                         Slider(
                             value = positionInSong.toFloat(),
                             onValueChange = {
-                                coroutineJob.cancel()
+                                if(mediaPlayerInitialized) {
+                                    coroutineJob.cancel()
+                                }
                                 positionInSong = it.roundToInt()
                             },
                             valueRange = 0f..durationOfSong.toFloat(),
